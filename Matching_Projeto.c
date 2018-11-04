@@ -1,4 +1,5 @@
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -27,8 +28,8 @@ int main(){
 	FILE *arq1;
 	FILE *arq2;
 	FILE *arq3;
-	char vetorTeste1[345] = "16541313AUTOR1yyyyyyyyyyyyyyyyyyyyyyyyMUSICA1yyyyyyyyyyyyy00/02/0513\n16541313AUTOR7yyyyyyyyyyyyyyyyyyyyyyyyMUSICA7yyyyyyyyyyyyy00/02/0513\n06746202AUTOR2yyyyyyyyyyyyyyyyyyyyyyyyMUSICA2yyyyyyyyyyyyy14/00/1606\n86096202AUTOR72yyyyyyyyyyyyyyyyyyyyyyyMUSICA59yyyyyyyyyyyy14/08/1606\n17096202AUTOR92yyyyyyyyyyyyyyyyyyyyyyyMUSICA19yyyyyyyyyyyy24/12/1783\n";
-	char vetorTeste2[276] = "16541313AUTOR1yyyyyyyyyyyyyyyyyyyyyyyyMUSICA2yyyyyyyyyyyyy00/02/0513\n16541313AUTOR7yyyyyyyyyyyyyyyyyyyyyyyyMUSICA7yyyyyyyyyyyyy00/02/0513\n86096202AUTOR4yyyyyyyyyyyyyyyyyyyyyyyyMUSICA2yyyyyyyyyyyyy14/00/1606\n86096202AUTOR72yyyyyyyyyyyyyyyyyyyyyyyMUSICA59yyyyyyyyyyyy14/08/1606\n";
+	char vetorTeste1[345] = "00000000AUTOR1yyyyyyyyyyyyyyyyyyyyyyyyMUSICA1yyyyyyyyyyyyy00/00/0000\n11111111AUTOR2yyyyyyyyyyyyyyyyyyyyyyyyMUSICA3yyyyyyyyyyyyy00/00/0000\n33333333AUTOR3yyyyyyyyyyyyyyyyyyyyyyyyMUSICA5yyyyyyyyyyyyy00/00/0000\n44444444AUTOR4yyyyyyyyyyyyyyyyyyyyyyyyMUSICA12yyyyyyyyyyyy00/00/0000\n55555555AUTOR92yyyyyyyyyyyyyyyyyyyyyyyMUSICA19yyyyyyyyyyyy00/00/0000\n";
+	char vetorTeste2[276] = "00000000AUTOR1yyyyyyyyyyyyyyyyyyyyyyyyMUSICA2yyyyyyyyyyyyy00/00/0000\n11111111AUTOR3yyyyyyyyyyyyyyyyyyyyyyyyMUSICA3yyyyyyyyyyyyy00/00/0000\n33333333AUTOR3yyyyyyyyyyyyyyyyyyyyyyyyMUSICA5yyyyyyyyyyyyy00/00/0000\n44444444AUTOR4yyyyyyyyyyyyyyyyyyyyyyyyMUSICA12yyyyyyyyyyyy00/00/1000\n";
 	
 	int result1;
 	int result2;
@@ -69,47 +70,90 @@ int main(){
 	char aux[69];
 
 	int posatual = 0;
+	int origem = 0;
+	int seek;
+	seek = posatual + origem;
+	//(buffer1 != EOF) || (buffer2 != EOF)
+	//origem<70
 	
   
 //campo 2
-	while((buffer1 != EOF) || (buffer2 != EOF)){
-		printf("%c\n%c\n", buffer1 , buffer2);
+	while(!feof(arq1) && !feof(arq2)){
+		printf("buffer1 %c\n",buffer1 );
+		printf("buffer2 %c\n",buffer2 );
+		origem++;
 
 		if(buffer1==buffer2){
 
-			printf("buffer iguais\n");
+			printf("buffers iguais\n");
 			aux[posatual]=buffer1;
-			printf("guardado no buffer%d %c\n",posatual, aux[posatual] );
-
+		
 			if(posatual== 68){
-				printf("fechou um registro\n");
-				fwrite (&aux[0], sizeof(char), 69,arq3 );
-				printf("\n");
-				posatual = -1;
-				
 
-			}
+				//memcpy(arq3[0],&aux[0],69);
+				fwrite (&aux[0], sizeof(char), 69,arq3 );
+				posatual = -1;
+				}
+
 			buffer1 = fgetc(arq1);
 			buffer2 = fgetc(arq2);
 			posatual ++;
+			//origem ++;
+
 			
 		}
 		else{
-			printf("buffers diferentes\n");
-			//buffer1 = fseek(arq1,sizeof(1-posatual), SEEK_CUR);
-			//buffer2 = fseek(arq2,sizeof(1-posatual), SEEK_CUR);
-			//buffer1 = (3-posatual)*fgetc(arq1);
-			//buffer2 = (3-posatual)*fgetc(arq2);
-			for (int x=0;x<(69-posatual); x++)
+			if(buffer1<buffer2){
+				printf("buffer1 < buffer2\n");
+				for (int x=0;x<(69-posatual); x++)
 			{
 				buffer1 = fgetc(arq1);
-				buffer2 = fgetc(arq2);
+		
 			}
+			//for (int i = 0;i<posatual;i++)
+			//{
+			//	buffer2 = - fgetc(arq2);
+			//}
+			fseek(arq2,(-posatual-1),SEEK_CUR) ;
+			printf("buffer2 pos seek %c\n",buffer2 );
+			buffer2 = fgetc(arq2);
+			printf("buffer2 pos igualar %c\n",buffer2 );
+			
+		
+		}
+			else{
+				if(buffer1>buffer2){
+					printf("buffer2 < buffer1\n");
+					for (int k=0;k<(69-posatual); k++)
+					{
+						buffer2 = fgetc(arq2);
+	
+					}
+
+					//for (int i = 0;i<posatual;i++)
+					//{
+					//	buffer1= - fgetc(arq1);
+					//}
+					
+					fseek(arq1,(-posatual-1),SEEK_CUR);
+					printf("buffer1 pos seek %c\n",buffer1 );
+					//rewind(arq1);
+					buffer1 = fgetc(arq1);
+					printf("buffer1 pos igualar %c\n",buffer1 );
+			
+					printf("%d\n",seek );
+				}
+				
+			}
+			
+			
 			posatual=0;
 
 		}
 	}
 	
+
+
 
 
 
